@@ -1,0 +1,92 @@
+{
+  "deepseek_r1": {
+    "model": "deepseek-reasoner",
+    "version": "R1",
+    "base_url": "https://api.deepseek.com",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "DEEPSEEK_API_KEY",
+    "response_type": "deepseek-reasoner",
+    "description": "DeepSeek R1 模型 LangChain 接口"
+  },
+  "deepseek_v3": {
+    "model": "deepseek-chat",
+    "version": "V3",
+    "base_url": "https://api.deepseek.com",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "DEEPSEEK_API_KEY",
+    "response_type": "deepseek-chat",
+    "description": "DeepSeek V3 模型 LangChain 接口"
+  },
+  "huawei_deepseek_r1_32k": {
+    "model": "DeepSeek-R1",
+    "version": "R1",
+    "base_url": "https://maas-cn-southwest-2.modelarts-maas.com/deepseek-r1/v1",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
+    "response_type": "deepseek-reasoner",
+    "description": "华为云的 DeepSeek R1 32K 模型 LangChain DeepSeek 接口"
+  },
+  "huawei_deepseek_v3_32k": {
+    "model": "DeepSeek-V3",
+    "version": "V1",
+    "base_url": "https://maas-cn-southwest-2.modelarts-maas.com/deepseek-v3/v1",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
+    "response_type": "deepseek-chat",
+    "description": "华为云的 DeepSeek V3 32K 模型 LangChain DeepSeek 接口"
+  },
+  "huawei_DeepSeek-R1-32K-0528": {
+    "model": "deepseek-r1-250528",
+    "version": "R1",
+    "base_url": "https://api.modelarts-maas.com/v1",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
+    "response_type": "deepseek-reasoner",
+    "description": "华为云的 DeepSeek-R1-32K-0528 模型 LangChain DeepSeek 接口"
+  },
+  "huawei_qwen3-32b": {
+    "model": "qwen3-32b",
+    "version": "V1",
+    "base_url": "https://api.modelarts-maas.com/v1",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
+    "response_type": "deepseek-chat",
+    "description": "华为云的 qwen3-32b 模型 LangChain DeepSeek 接口"
+  },
+  "huawei_qwen3-235b-a22b": {
+    "model": "qwen3-235b-a22b",
+    "version": "V1",
+    "base_url": "https://api.modelarts-maas.com/v1",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
+    "response_type": "deepseek-chat",
+    "description": "华为云的 qwen3-235b-a22b 模型 LangChain DeepSeek 接口"
+  },
+  "home_deepseek-r1:32b": {
+    "model": "deepseek-r1:32b",
+    "version": "32b",
+    "base_url": "https://localhost:11434",
+    "type": "BaseLLM",
+    "provider": "langchain-ollama",
+    "env_api_key_name": null,
+    "response_type": "deepseek-reasoner",
+    "description": "本地 DeepSeek R1 32b 模型 LangChain 接口"
+  },
+  "home_qwen3:32b": {
+    "model": "qwen3:32b",
+    "version": "32b",
+    "base_url": "https://localhost:11434",
+    "type": "BaseLLM",
+    "provider": "langchain-ollama",
+    "env_api_key_name": null,
+    "response_type": "deepseek-reasoner",
+    "description": "本地 qwen3:32b 模型 LangChain 接口"
+  }
+}
