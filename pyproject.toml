@@ -8,14 +8,25 @@ version = "0.1.0"
 authors = [
     { name="Fang JiaWei", email="fjw12998@hotmail.com" },
 ]
-description = "LLM redis 中介客户端程序"
+description = "LLM redis中介的客户端程序"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
+dependencies = [
+    "langchain_core>=0.3.72,<0.4.0",
+    "pytest==8.4.1,<9.0.0",
+    "redis==5.3.0,<6.0.0",
+    "Requests==2.32.4,<3.0.0",
+    "llm_tokenizers>=0.1.2"
+]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent"
 ]
+license = "GPL-3.0-or-later"
 
 [project.scripts]
 chat-session = "chat_session_main:main"
