@@ -21,9 +21,17 @@ pip install -r requirements.txt
 ```
 
 ### 3. 完成安装后进行配置文件初始化
+
+执行如下的命令，可以对 `llm-client-redis` 生成初始的配置文件
+
 ```commandline
 llm-client-init
 ```
+
+路径在 `~/.llm-client-redis/config/` 下，分别生成 `config.ini` 和 `llm_resources.json` 文件
+
+* `config.ini` 文件用于配置 `redis` 的连接信息
+* `llm_resources.json` 文件用于配置 `llm` 的信息，包括 `llm` 的名称，需要与服务器端一致
 
 ## 使用说明
 
@@ -34,7 +42,6 @@ llm-client-init
 一次获取所有回答内容，等待出现相应的时间会较长
 
 ```python
-
 from src.llm_client_redis import LLMClientRedis
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 from typing import List
@@ -57,6 +64,8 @@ print(data)
 ```shell
 chat-session
 ```
+
+进入命令行模式，实现调用
 
 ## 参与贡献
 
