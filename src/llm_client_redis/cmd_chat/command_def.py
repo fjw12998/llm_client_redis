@@ -2,7 +2,7 @@ import traceback
 import shlex
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from src.llm_client_redis import LLMClientRedis
+from llm_client_redis import LLMClientRedis
 from langchain_core.messages import HumanMessage, SystemMessage, BaseMessage
 
 

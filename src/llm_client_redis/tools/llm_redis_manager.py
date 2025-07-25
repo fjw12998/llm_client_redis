@@ -4,30 +4,13 @@ import os
 import time
 from configparser import ConfigParser
 from datetime import datetime, timezone
-from typing import Optional, Any
+from typing import Optional
 
 import redis
 from langchain_core.messages import BaseMessage
 from redis import RedisError
 from redis.exceptions import TimeoutError
 
-# 模块级别的日志配置
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-if not logger.handlers:
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
-
-# 读取配置文件中的日志级别
-_config_file_path = os.path.join(os.path.dirname(__file__), './config', 'config.ini')
-if os.path.exists(_config_file_path):
-    _configparser = ConfigParser()
-    _configparser.read(_config_file_path, encoding='utf-8')
-    log_level = _configparser['logging'].get('level', 'INFO').upper()
-    logger.setLevel(log_level)
 
 class LLMRedisManager:
     _instance = None
@@ -68,12 +51,12 @@ class LLMRedisManager:
 
         self.answer_map_name = configparser['redis_server']['answer_map_name']
 
-        logger.info('RedisManager initialized with host: %s, '
-                    'port: %s, '
-                    'password_env_var_name: %s, '
-                    'db: %s, '
-                    'request_stream_name: %s',
-                    self.host, self.port, self.password_env_var_name, self.db, self.request_stream_name)
+        logging.info('RedisManager initialized with host: %s, '
+                     'port: %s, '
+                     'password_env_var_name: %s, '
+                     'db: %s, '
+                     'request_stream_name: %s',
+                     self.host, self.port, self.password_env_var_name, self.db, self.request_stream_name)
 
         self._connection_pool = redis.ConnectionPool(
             host=self.host,
@@ -85,7 +68,7 @@ class LLMRedisManager:
         # 读取 Redis 存档配置
         self.redis_arch_enable: bool = str.lower(configparser['redis_arch'].get('redis_arch_enable', "true")) == "true"
 
-        logger.info('RedisManager initialized with redis_arch_enable: %s', self.redis_arch_enable)
+        logging.info('RedisManager initialized with redis_arch_enable: %s', self.redis_arch_enable)
 
         if self.redis_arch_enable:
             self.redis_arch_host: str = configparser['redis_arch']['redis_arch_host']
@@ -94,13 +77,13 @@ class LLMRedisManager:
             self.redis_arch_db: int = int(configparser['redis_arch']['redis_arch_db'])
             self.redis_arch_data_stream_name: str = configparser['redis_arch']['redis_arch_data_stream_name']
 
-            logger.info('RedisManager initialized with redis_arch_host: %s, redis_arch_port: %s, '
-                        'redis_arch_password_env_var_name: %s, redis_arch_db: %s, redis_arch_data_stream_name: %s',
-                        self.redis_arch_host,
-                        self.redis_arch_port,
-                        self.redis_arch_password_env_var_name,
-                        self.redis_arch_db,
-                        self.redis_arch_data_stream_name)
+            logging.info('RedisManager initialized with redis_arch_host: %s, redis_arch_port: %s, '
+                         'redis_arch_password_env_var_name: %s, redis_arch_db: %s, redis_arch_data_stream_name: %s',
+                         self.redis_arch_host,
+                         self.redis_arch_port,
+                         self.redis_arch_password_env_var_name,
+                         self.redis_arch_db,
+                         self.redis_arch_data_stream_name)
 
             self._arch_connection_pool = redis.ConnectionPool(
                 host=self.redis_arch_host,
@@ -117,7 +100,7 @@ class LLMRedisManager:
         try:
             return redis.Redis(connection_pool=self._connection_pool)
         except redis.RedisError as e:
-            logger.error("Failed to get Redis connection: %s", e)
+            logging.error("Failed to get Redis connection: %s", e)
             raise
 
     def get_redis_arch_connection(self) -> redis.Redis:
@@ -128,7 +111,7 @@ class LLMRedisManager:
         try:
             return redis.Redis(connection_pool=self._arch_connection_pool)
         except redis.RedisError as e:
-            logger.error("Failed to get Redis arch connection: %s", e)
+            logging.error("Failed to get Redis arch connection: %s", e)
             raise
 
     def push_request(self, stream_name: str,
@@ -147,7 +130,7 @@ class LLMRedisManager:
         """
 
         if str.lower(action_type) not in ['generate', 'stream', 'agenerate', 'astream']:
-            logger.error("parameter action_type must be one of ['generate', 'stream', 'agenerate', 'astream'], but got %s", action_type)
+            logging.error("parameter action_type must be one of ['generate', 'stream', 'agenerate', 'astream'], but got %s", action_type)
             raise Exception("parameter action_type must be one of ['generate', 'stream', 'agenerate', 'astream'], but got %s", action_type)
 
         try:
@@ -167,7 +150,7 @@ class LLMRedisManager:
 
                 return seq
         except Exception as e:
-            logger.error("Failed to add request: %s", e)
+            logging.error("Failed to add request: %s", e)
             raise
 
     def pop_request(self,
@@ -187,7 +170,7 @@ class LLMRedisManager:
                 else:
                     return None
         except TimeoutError as e:
-            logger.error("Failed to get pending requests: %s", e)
+            logging.error("Failed to get pending requests: %s", e)
             raise
 
     def pop_response(self, seq: int) -> {}:
@@ -205,7 +188,7 @@ class LLMRedisManager:
                 else:
                     return None
         except TimeoutError as e:
-            logger.error("Failed to get response for seq %s: %s", seq, e)
+            logging.error("Failed to get response for seq %s: %s", seq, e)
             raise
         finally:
             conn.hdel(self.answer_map_name, str(seq))
@@ -228,7 +211,7 @@ class LLMRedisManager:
                 }))
 
         except Exception as e:
-            logger.error("Failed to save response for serial %s: %s", seq, e)
+            logging.error("Failed to save response for serial %s: %s", seq, e)
             raise
 
     def stream_chunk(self, seq: int,
@@ -255,10 +238,10 @@ class LLMRedisManager:
 
                     return
             except Exception as e:
-                logger.error("Failed to stream chunk to redis: %s", e)
+                logging.error("Failed to stream chunk to redis: %s", e)
                 if retry_count < retry:
                     retry_count += 1
-                    logger.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
+                    logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
                     time.sleep(retry_internal)
                 else:
                     raise RuntimeError(f"Failed to save to Redis: {e}") from e
@@ -266,7 +249,7 @@ class LLMRedisManager:
     def pop_stream_chunk(self, seq: int,
                          chunk_stream_prefix: str,
                          retry: int = 6,
-                         retry_internal: int = 20) -> Optional[Any]:
+                         retry_internal: int = 20) -> Optional[bytes]:
         f"""
         从 redis 中获取流式数据
         如果 ${chunk_stream_prefix}{seq} 的列表不存在时，返回空串
@@ -284,13 +267,15 @@ class LLMRedisManager:
                 with self.get_redis_connection() as conn:
                     return conn.rpop(f"{chunk_stream_prefix}{seq}")
             except Exception as e:
-                logger.error("Failed to pop stream chunk from redis: %s", e)
+                logging.error("Failed to pop stream chunk from redis: %s", e)
                 if retry_count < retry:
                     retry_count += 1
-                    logger.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
+                    logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
                     time.sleep(retry_internal)
                 else:
                     raise RuntimeError(f"Failed to pop from Redis: {e}") from e
+
+        return None
 
     def finish_stream(self, seq: int, chunk_stream_prefix: str,
                       retry: int = 6,
@@ -316,10 +301,10 @@ class LLMRedisManager:
                     return
             except Exception as e:
 
-                logger.error("Failed to save finish status to redis: %s", e)
+                logging.error("Failed to save finish status to redis: %s", e)
                 if retry_count < retry:
                     retry_count += 1
-                    logger.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
+                    logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
                     time.sleep(retry_internal)
                 else:
                     raise RuntimeError(f"Failed to save to Redis: {e}") from e
@@ -341,16 +326,18 @@ class LLMRedisManager:
         while retry_count < retry:
             try:
                 with self.get_redis_connection() as conn:
-                    return conn.sismember(f"{chunk_stream_prefix}", seq) == 1
+                    return conn.sismember(f"{chunk_stream_prefix}", str(seq)) == 1
             except Exception as e:
 
-                logger.error("Failed to check finish status from redis: %s", e)
+                logging.error("Failed to check finish status from redis: %s", e)
                 if retry_count < retry:
                     retry_count += 1
-                    logger.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
+                    logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
                     time.sleep(retry_internal)
                 else:
                     raise RuntimeError(f"Failed to check from Redis: {e}") from e
+
+        return None
 
 
     def rem_finish_stream(self, seq: int, chunk_stream_prefix: str,
@@ -375,10 +362,10 @@ class LLMRedisManager:
                     return
             except Exception as e:
 
-                logger.error("Failed to remove finish status from redis: %s", e)
+                logging.error("Failed to remove finish status from redis: %s", e)
                 if retry_count < retry:
                     retry_count += 1
-                    logger.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
+                    logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
                     time.sleep(retry_internal)
                 else:
                     raise RuntimeError(f"Failed to save to Redis: {e}") from e
@@ -402,7 +389,7 @@ class LLMRedisManager:
         """
 
         if not self.redis_arch_enable:
-            logger.debug(f"redis_arch_enable is false, no need to save to arch redis")
+            logging.debug(f"redis_arch_enable is false, no need to save to arch redis")
             return
 
         description:str = ""
@@ -428,25 +415,25 @@ class LLMRedisManager:
                 with self.get_redis_arch_connection() as conn:
                     # 将记录写入 Redis
                     conn.rpush(self.redis_arch_data_stream_name, json.dumps(record))
-                    logger.info(f"Record for serial {seq} saved to Redis")
+                    logging.info(f"Record for serial {seq} saved to Redis")
 
                 run_success = 1
 
             except RedisError as e:
-                logger.error("Redis 操作失败: %s", e)
+                logging.error("Redis 操作失败: %s", e)
 
                 if retry_count < retry:
                     retry_count += 1
-                    logger.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
+                    logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
                     time.sleep(retry_internal)
                 else:
                     raise RedisError(f"Failed to save to Redis: {e}") from e
             except Exception as e:
-                logger.error("保存到 Redis 失败: %s", e)
+                logging.error("保存到 Redis 失败: %s", e)
 
                 if retry_count < retry:
                     retry_count += 1
-                    logger.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
+                    logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
                     time.sleep(retry_internal)
                 else:
                     raise RuntimeError(f"Failed to save to Redis: {e}") from e
@@ -472,6 +459,6 @@ class LLMRedisManager:
 
                 return [json.loads(item) for item in data]
         except Exception as e:
-            logger.error("Failed to read latest data from Redis: %s", e)
+            logging.error("Failed to read latest data from Redis: %s", e)
             raise
 

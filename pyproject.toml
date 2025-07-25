@@ -29,7 +29,8 @@ classifiers = [
 license = "GPL-3.0-or-later"
 
 [project.scripts]
-chat-session = "chat_session_main:main"
+chat-session = "llm_client_redis.chat_session_main:main"
+llm-client-init = "llm_client_redis.llm_client:init"
 
 [project.urls]
 ## Homepage = "https://github.com/yourusername/llm_tools"

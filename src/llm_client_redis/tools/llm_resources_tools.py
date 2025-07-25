@@ -3,17 +3,6 @@ import logging
 
 from langchain_core.messages import BaseMessage
 
-# 模块级别的日志配置
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-if not logger.handlers:
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
-
-
 class LLMResourcesTools:
 
     def __init__(self, json_path: str):
@@ -21,8 +10,8 @@ class LLMResourcesTools:
         with open(json_path, 'r', encoding='utf-8') as f:
             self.llm_dic: dict = json.load(f)
 
-        logger.info(f'Loaded {len(self.llm_dic)} LLM resources from {json_path}')
-        logger.info(logger.info(f'Available LLM resources: {self.llm_dic.keys()}'))
+        logging.info(f'Loaded {len(self.llm_dic)} LLM resources from {json_path}')
+        logging.info(f'Available LLM resources: {self.llm_dic.keys()}')
 
     @staticmethod
     def format_messages_to_text(base_messages: list[BaseMessage]) -> str:

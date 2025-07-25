@@ -1,14 +1,5 @@
 # llm_client_redis
 
-
-
-## 功能
-
-
-
-
-# llm_client_redis
-
 ## 介绍
 整合多种llm 的api接入，使用 redis 作为消息队列，实现多客户端并发调用 llm 服务。本项目是调用部分，还有另一个项目专门用于接收 redis 消息，
 实现与 llm 的通信，并将返回结果给 redis，
@@ -19,9 +10,20 @@
 
 ## 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+### 1. 使用 `PyPI` 安装
+```commandline
+pip install llm_client_redis
+```
+
+### 2. 项目安装
+```commandline
+pip install -r requirements.txt
+```
+
+### 3. 完成安装后进行配置文件初始化
+```commandline
+llm-client-init
+```
 
 ## 使用说明
 

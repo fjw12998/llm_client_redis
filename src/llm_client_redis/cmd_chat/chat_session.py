@@ -3,7 +3,7 @@ import os
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from src.llm_client_redis.tools import OutputTools
+from llm_client_redis.tools import OutputTools
 from .command_def import Command
 from .command_def import AbstractChatSession
 
