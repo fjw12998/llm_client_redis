@@ -1,10 +1,11 @@
+import logging
+
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
-from llm_client_redis import LLMClientRedis
+from pydantic import BaseModel, field_validator
+from .llm_client import LLMClientRedis
 from langchain_core.messages import SystemMessage, HumanMessage
-from typing import List, AsyncGenerator
-import asyncio
+from typing import List
 
 app = FastAPI()
 
@@ -16,6 +17,12 @@ class StreamRequest(BaseModel):
     message: str
     model: str = None
     system_message: str = None
+
+    @field_validator('system_message')
+    def validate_system_message(cls, v):
+        if v == "":
+            return None
+        return v
 
 class StreamMessagesRequest(BaseModel):
     messages: List[dict]  # 包含role和content的字典列表
@@ -35,6 +42,7 @@ async def stream(request: StreamRequest):
 
         # 使用默认模型如果未指定
         model = request.model or "home_qwen3:32b"
+        logging.info(f"model: {model}")
 
         # 创建异步生成器包装器
         async def generate():
