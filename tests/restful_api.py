@@ -35,7 +35,7 @@ def demo_stream_request():
         "model": "home_qwen3:32b"
     }
 
-    response = requests.get(f"{base_url}/stream", json=payload, stream=True)
+    response = requests.post(f"{base_url}/stream", json=payload, stream=True)
 
     if response.status_code == 200:
         print("响应内容:")
