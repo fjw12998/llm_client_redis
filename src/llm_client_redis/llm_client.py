@@ -55,7 +55,7 @@ class LLMClientRedis:
     def request(self, messages: List[BaseMessage],
                 model: str,
                 block_time = 20 * 60,
-                internal: int = 1,
+                internal: float = 0.2,
                 enable_arch: bool = True) -> {}:
         """
         将请求消息推送到 Redis 队列中，原样返回答复
@@ -193,7 +193,7 @@ class LLMClientRedis:
     def request_messages(self, messages: List[BaseMessage],
                          model: str,
                          block_time =20 * 60,
-                         internal: int = 1,
+                         internal: float = 0.2,
                          enable_arch: bool = True) -> {}:
         """
         将请求消息推送到 Redis 队列中，使用 config.ini 中配置的 response_type 来处理响应，再返回结果
@@ -204,7 +204,11 @@ class LLMClientRedis:
         :param enable_arch: 是否启用归档，默认为 True
         :return: 请求序列号，请求序号是用于获取响应的
         """
-        answer = self.request(messages=messages, model=model, block_time=block_time, internal=internal, enable_arch=enable_arch)
+        answer = self.request(messages=messages,
+                              model=model,
+                              block_time=block_time,
+                              internal=internal,
+                              enable_arch=enable_arch)
 
         return answer
 
@@ -212,7 +216,7 @@ class LLMClientRedis:
                           human: str,
                           model: str,
                           block_time =20 * 60,
-                          internal: int = 1,
+                          internal: float = 0.2,
                           enable_arch: bool = True) -> {}:
         """
         将请求消息推送到 Redis 队列中，使用 config.ini 中配置的 response_type 来处理响应，再返回结果
@@ -226,16 +230,26 @@ class LLMClientRedis:
         """
         messages: List[BaseMessage] = [SystemMessage(system), HumanMessage(human)]
 
-        return self.request_messages(messages=messages, model=model, block_time=block_time, internal=internal, enable_arch=enable_arch)
+        return self.request_messages(messages=messages,
+                                     model=model,
+                                     block_time=block_time,
+                                     internal=internal,
+                                     enable_arch=enable_arch)
 
-    def request_file_human(self, system_file_path: str, human: str, model: str, block_time =20 * 60, internal: int = 1, enable_arch: bool = True) -> {}:
+    def request_file_human(self,
+                           system_file_path: str,
+                           human: str,
+                           model: str,
+                           block_time = 20 * 60,
+                           internal: float = 0.2,
+                           enable_arch: bool = True) -> {}:
         """
         将请求消息推送到 Redis 队列中，使用 config.ini 中配置的 response_type 来处理响应，再返回结果
         :param system_file_path: 提示词文件路径
         :param human: 问题
         :param model: 使用的模型
         :param block_time: 阻塞时间，单位为秒,默认为5分钟
-        :param internal: 请求答案的时间间隔，单位为秒，默认为1秒
+        :param internal: 请求答案的时间间隔，单位为秒，默认为0.2秒
         :param enable_arch: 是否启用归档，默认为 True
         :return: 请求序列号，请求序号是用于获取响应的
         """
@@ -244,7 +258,11 @@ class LLMClientRedis:
 
         messages: List[BaseMessage] = [SystemMessage(prompt), HumanMessage(human)]
 
-        return self.request_messages(messages=messages, model=model, block_time=block_time, internal=internal, enable_arch=enable_arch)
+        return self.request_messages(messages=messages,
+                                     model=model,
+                                     block_time=block_time,
+                                     internal=internal,
+                                     enable_arch=enable_arch)
 
 def init():
     LLMClientRedis()
