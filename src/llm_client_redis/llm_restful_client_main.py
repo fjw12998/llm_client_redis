@@ -97,6 +97,18 @@ async def stream_messages(request: StreamMessagesRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/models.json")
+@app.post("/models.json")
+async def post_models():
+    """
+    获取可用模型列表
+    """
+    try:
+        # 这里需要访问LLMResourcesTools来获取模型列表
+        # 由于是私有属性，我们可以通过其他方式获取
+        return llm.llm_resources_tools.list_llm_def()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/models")
 async def list_models():
@@ -107,5 +119,16 @@ async def list_models():
         # 这里需要访问LLMResourcesTools来获取模型列表
         # 由于是私有属性，我们可以通过其他方式获取
         return llm.llm_resources_tools.list_llm_def()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/demo.json")
+async def post_demo():
+    """
+    获取可用模型列表
+    """
+    try:
+        return ["Hello World!"]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

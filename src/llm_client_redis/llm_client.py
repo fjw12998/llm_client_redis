@@ -100,7 +100,7 @@ class LLMClientRedis:
     def request_stream(self, messages: list[BaseMessage],
                        model: str,
                        block_time=20 * 60,
-                       internal: float = 0.02,
+                       internal: float = 0.2,
                        enable_arch: bool = True) -> Generator[Any, Any, None]:
 
         action_type: str = "stream"
@@ -153,8 +153,18 @@ class LLMClientRedis:
 
                         logging.info(f"seq: {seq} stream is finished")
 
-                        self.redis_manager.rem_finish_stream(seq=seq, chunk_stream_prefix=self.chunk_stream_prefix)
-                        return None
+                        # 是否存在一个可能，就是流已标记结束，但刚好还有数据在 stream_chunk 的队列中没有补取出？
+                        end_chunk_data = self.redis_manager.pop_stream_chunk(seq=seq,
+                                                                             chunk_stream_prefix=self.chunk_stream_prefix)
+
+                        if end_chunk_data:
+                            logging.warning(f"seq: {seq} stream is finished, but there is still data in the stream_chunk queue, data: {end_chunk_data}")
+                            chunk_data = end_chunk_data
+                        else:
+                            logging.debug(f"seq: {seq} stream is finished, no data in the stream_chunk queue")
+
+                            self.redis_manager.rem_finish_stream(seq=seq, chunk_stream_prefix=self.chunk_stream_prefix)
+                            return None
 
                     else:
                         logging.debug(f"seq: {seq} no chunk data received, retrying in {internal} seconds")
