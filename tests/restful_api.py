@@ -14,6 +14,21 @@ def demo_stream_request():
     # FastAPI 服务的基础 URL
     base_url = "http://127.0.0.1:8080"  # 根据实际部署地址修改
 
+    # 示例-1: 访问demo
+    print("=== 示例-1: 访问demo ===")
+    response = requests.get(f"{base_url}/demo.json")
+
+    if response.status_code == 200:
+        print("响应内容:")
+        for chunk in response.iter_content(chunk_size=None):
+            if chunk:
+                print(chunk.decode('utf-8'), end='', flush=True)
+        print("\n")
+    else:
+        print(f"请求失败，状态码: {response.status_code}")
+        print(f"错误信息: {response.text}")
+
+
     # 示例0: 基本请求
     print("=== 示例0: 基本请求 ===")
     response = requests.get(f"{base_url}/models")
