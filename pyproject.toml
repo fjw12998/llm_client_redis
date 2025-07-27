@@ -16,6 +16,11 @@ dependencies = [
     "pytest==8.4.1,<9.0.0",
     "redis==5.3.0,<6.0.0",
     "Requests==2.32.4,<3.0.0",
+    "fastapi>=0.116.1,<0.117.0",
+    "uvicorn>=0.35.0,<0.36.0",
+    "gunicorn>=23.0.0,<24.0.0",
+    "pydantic>=2.11.7,<3.0.0",
+    "watchfiles>=1.1.0,<2.0.0",
     "llm_tokenizers>=0.1.2"
 ]
 classifiers = [
@@ -33,5 +38,5 @@ chat-session = "llm_client_redis.chat_session_main:main"
 llm-client-init = "llm_client_redis.llm_client:init"
 
 [project.urls]
-## Homepage = "https://github.com/yourusername/llm_tools"
-## Documentation = "https://github.com/yourusername/llm_tools/docs"
+Homepage = "https://gitee.com/sky_flash/llm_client_redis"
+Documentation = "https://gitee.com/sky_flash/llm_client_redis/docs"
