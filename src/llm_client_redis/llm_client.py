@@ -16,6 +16,11 @@ class LLMClientRedis:
     使用 Redis 实现的 LLM 请求器
     """
     def __init__(self, llm_json_path: str = None, config_path: str = None):
+        """
+        初始化 LLMClientRedis 对象
+        :param llm_json_path: llm 资源文件路径
+        :param config_path: 配置文件路径
+        """
 
         # 设置默认路径
         home = Path.home()
