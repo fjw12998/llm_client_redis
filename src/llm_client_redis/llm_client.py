@@ -60,14 +60,14 @@ class LLMClientRedis:
     def request(self, messages: List[BaseMessage],
                 model: str,
                 block_time = 20 * 60,
-                internal: float = 0.2,
+                internal: float = 0.5,
                 enable_arch: bool = True) -> {}:
         """
         将请求消息推送到 Redis 队列中，原样返回答复
         :param messages: 请求消息列表
         :param model: 使用的模型
-        :param block_time: 阻塞时间，单位为秒,默认为5分钟
-        :param internal: 请求答案的时间间隔，单位为秒，默认为1秒
+        :param block_time: 阻塞时间，单位为秒,默认为20分钟
+        :param internal: 请求答案的时间间隔，单位为秒，默认为0.5秒
         :param enable_arch: 是否启用归档，默认为 True
         :return: 请求序列号，请求序号是用于获取响应的
         """
@@ -105,7 +105,7 @@ class LLMClientRedis:
     def request_stream(self, messages: list[BaseMessage],
                        model: str,
                        block_time=20 * 60,
-                       internal: float = 0.2,
+                       internal: float = 0.02,
                        enable_arch: bool = True) -> Generator[Any, Any, None]:
 
         action_type: str = "stream"
@@ -198,14 +198,14 @@ class LLMClientRedis:
     def request_messages(self, messages: List[BaseMessage],
                          model: str,
                          block_time =20 * 60,
-                         internal: float = 0.2,
+                         internal: float = 0.5,
                          enable_arch: bool = True) -> {}:
         """
         将请求消息推送到 Redis 队列中，使用 config.ini 中配置的 response_type 来处理响应，再返回结果
         :param messages: 请求消息列表
         :param model: 使用的模型
-        :param block_time: 阻塞时间，单位为秒,默认为5分钟
-        :param internal: 请求答案的时间间隔，单位为秒，默认为1秒
+        :param block_time: 阻塞时间，单位为秒,默认为20分钟
+        :param internal: 请求答案的时间间隔，单位为秒，默认为0.5秒
         :param enable_arch: 是否启用归档，默认为 True
         :return: 请求序列号，请求序号是用于获取响应的
         """
@@ -221,15 +221,15 @@ class LLMClientRedis:
                           human: str,
                           model: str,
                           block_time =20 * 60,
-                          internal: float = 0.2,
+                          internal: float = 0.5,
                           enable_arch: bool = True) -> {}:
         """
         将请求消息推送到 Redis 队列中，使用 config.ini 中配置的 response_type 来处理响应，再返回结果
         :param system: 提示词
         :param human: 问题
         :param model: 使用的模型
-        :param block_time: 阻塞时间，单位为秒,默认为5分钟
-        :param internal: 请求答案的时间间隔，单位为秒，默认为1秒
+        :param block_time: 阻塞时间，单位为秒,默认为20分钟
+        :param internal: 请求答案的时间间隔，单位为秒，默认为0.5秒
         :param enable_arch: 是否启用归档，默认为 True
         :return:
         """
@@ -246,15 +246,15 @@ class LLMClientRedis:
                            human: str,
                            model: str,
                            block_time = 20 * 60,
-                           internal: float = 0.2,
+                           internal: float = 0.5,
                            enable_arch: bool = True) -> {}:
         """
         将请求消息推送到 Redis 队列中，使用 config.ini 中配置的 response_type 来处理响应，再返回结果
         :param system_file_path: 提示词文件路径
         :param human: 问题
         :param model: 使用的模型
-        :param block_time: 阻塞时间，单位为秒,默认为5分钟
-        :param internal: 请求答案的时间间隔，单位为秒，默认为0.2秒
+        :param block_time: 阻塞时间，单位为秒,默认为20分钟
+        :param internal: 请求答案的时间间隔，单位为秒，默认为0.5秒
         :param enable_arch: 是否启用归档，默认为 True
         :return: 请求序列号，请求序号是用于获取响应的
         """
