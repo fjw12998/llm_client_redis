@@ -109,3 +109,4 @@ venv.bak/
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/vcs.xml
 .arts/settings.json
+.arts/launch.json
