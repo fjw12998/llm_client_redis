@@ -27,9 +27,9 @@ class LLMClientRedis:
         default_config_dir = home / ".llm_client_redis" / "config"
         default_config_dir.mkdir(parents=True, exist_ok=True)
 
-        if config_path is None:
+        if not config_path:
             config_path = default_config_dir / "config.ini"
-        if llm_json_path is None:
+        if not llm_json_path:
             llm_json_path = default_config_dir / "llm_resources.json"
 
         # 确保路径是字符串
