@@ -1,0 +1,38 @@
+name: Publish Python Package
+
+on:
+  push:
+    tags:
+      - 'v*' # 触发条件：当推送以 "v" 开头的 Git tag 时（例如 v0.1.0）
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+    environment: pypi
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+
+      - name: Build package
+        run: |
+          python -m build
+
+      - name: Publish package to PyPI
+        if: matrix.python-version == '3.9' # 只在其中一个版本执行上传，避免重复上传
+        uses: pypa/gh-action-pypi-publish@v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}

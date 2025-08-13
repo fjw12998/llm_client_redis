@@ -4,22 +4,39 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "llm_client_redis"
-version = "0.1.0"
+version = "0.1.5"
 authors = [
     { name="Fang JiaWei", email="fjw12998@hotmail.com" },
 ]
-description = "LLM redis 中介客户端程序"
+description = "LLM redis中介的客户端程序"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
+dependencies = [
+    "langchain_core>=0.3.72,<0.4.0",
+    "pytest==8.4.1,<9.0.0",
+    "redis==5.3.0,<6.0.0",
+    "Requests==2.32.4,<3.0.0",
+    "fastapi>=0.116.1,<0.117.0",
+    "uvicorn>=0.35.0,<0.36.0",
+    "gunicorn>=23.0.0,<24.0.0",
+    "pydantic>=2.11.7,<3.0.0",
+    "watchfiles>=1.1.0,<2.0.0",
+    "llm_tokenizers>=0.1.2"
+]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent"
 ]
+license = "GPL-3.0-or-later"
 
 [project.scripts]
-chat-session = "chat_session_main:main"
+chat-session = "llm_client_redis.chat_session_main:main"
+llm-client-init = "llm_client_redis.llm_client:init"
 
 [project.urls]
-## Homepage = "https://github.com/yourusername/llm_tools"
-## Documentation = "https://github.com/yourusername/llm_tools/docs"
+Homepage = "https://gitee.com/sky_flash/llm_client_redis"
+Documentation = "https://gitee.com/sky_flash/llm_client_redis/docs"
