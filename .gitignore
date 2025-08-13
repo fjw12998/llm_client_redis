@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+.arts/settings.json
+.idea/.gitignore
+.idea/llm_client_redis.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default.xml
