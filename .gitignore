@@ -110,3 +110,8 @@ venv.bak/
 /.idea/vcs.xml
 .arts/settings.json
 .arts/launch.json
+<<<<<<< HEAD
+=======
+.idea/inspectionProfiles/Project_Default.xml
+>>>>>>> 10ae4312f6b8874518a968e57ce7d0c074e342f7
+.idea/workspace.xml
