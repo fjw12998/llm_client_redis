@@ -4,7 +4,7 @@ import os
 import pytest
 import redis
 
-from src.llm_client_redis.tools.llm_redis_manager import LLMRedisManager
+from llm_client_redis.tools.llm_redis_manager import LLMRedisManager
 
 @pytest.fixture
 def configparser_mock():
