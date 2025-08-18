@@ -21,7 +21,7 @@ class LLMRedisManager:
             cls._instance.__initialized = False
         return cls._instance
 
-    def __init__(self, configparser: ConfigParser = None):
+    def __init__(self, configparser: Optional[ConfigParser] = None):
         """
         从 config.ini 文件中读取 Redis 服务器的配置信息
         """
@@ -137,36 +137,41 @@ class LLMRedisManager:
         if str.lower(action_type) not in ['generate', 'stream', 'agenerate', 'astream']:
             logging.error("parameter action_type must be one of ['generate', 'stream', 'agenerate', 'astream'], but got %s", action_type)
             raise Exception("parameter action_type must be one of ['generate', 'stream', 'agenerate', 'astream'], but got %s", action_type)
+        
+        while retry_count < retry:
+        
+            if retry_count > 0:
+                logging.warning(f"正在进行重试操作{retry_count}次")
 
-        try:
-            with self.get_redis_connection() as conn:
+            try:
+                with self.get_redis_connection() as conn:
 
-                seq: int = conn.incrby(f"request:{stream_name}:count")
+                    seq: int = conn.incrby(f"request:{stream_name}:count")
 
-                request: {} = {'seq': seq,
-                               'model': model,
-                               'action_type': action_type,
-                               'messages': [msg.model_dump() for msg in messages],
-                               'enable_arch': enable_arch}
+                    request: {} = {'seq': seq,
+                                'model': model,
+                                'action_type': action_type,
+                                'messages': [msg.model_dump() for msg in messages],
+                                'enable_arch': enable_arch}
 
-                data: str = json.dumps(request)
+                    data: str = json.dumps(request)
 
-                conn.rpush(stream_name, data)
+                    conn.rpush(stream_name, data)
 
-                return seq
-        except Exception as e:
-            logging.error("Failed to add request: %s", e)
-            if retry_count < retry:
-                retry_count += 1
-                logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
-                time.sleep(retry_internal)
-            else:
-                raise RuntimeError(f"Failed to push request to Redis: {e}") from e
+                    return seq
+            except Exception as e:
+                logging.error("Failed to add request: %s", e)
+                if retry_count < retry:
+                    retry_count += 1
+                    logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
+                    time.sleep(retry_internal)
+                else:
+                    raise RuntimeError(f"Failed to push request to Redis: {e}") from e
 
     def pop_request(self,
                     stream_name: str,
                     retry: int = 6,
-                    retry_internal: int = 20) -> {}:
+                    retry_internal: int = 20) -> Optional[dict]:
         """
         获取待处理请求
         :param stream_name: 流名称
@@ -176,27 +181,32 @@ class LLMRedisManager:
         """
         retry_count: int = 0
 
-        try:
-            with self.get_redis_connection() as conn:
+        while retry_count < retry:
+        
+            if retry_count > 0:
+                logging.warning(f"正在进行重试操作{retry_count}次")
 
-                data: str = conn.lpop(name=stream_name)
+            try:
+                with self.get_redis_connection() as conn:
 
-                if data:
-                    return json.loads(data)
+                    data: str = conn.lpop(name=stream_name)
+
+                    if data:
+                        return json.loads(data)
+                    else:
+                        return None
+            except TimeoutError as e:
+                logging.error("Failed to get pending requests: %s", e)
+                if retry_count < retry:
+                    retry_count += 1
+                    logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
+                    time.sleep(retry_internal)
                 else:
-                    return None
-        except TimeoutError as e:
-            logging.error("Failed to get pending requests: %s", e)
-            if retry_count < retry:
-                retry_count += 1
-                logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
-                time.sleep(retry_internal)
-            else:
-                raise RuntimeError(f"Failed to pop request from Redis: {e}") from e
+                    raise RuntimeError(f"Failed to pop request from Redis: {e}") from e
 
     def pop_response(self, seq: int,
                      retry: int = 6,
-                     retry_internal: int = 20) -> {}:
+                     retry_internal: int = 20) -> Optional[dict]:
         """
         获取响应结果
         :param seq: 指定序号
@@ -206,24 +216,29 @@ class LLMRedisManager:
         """
         retry_count: int = 0
 
-        try:
-            with self.get_redis_connection() as conn:
-                data: str = conn.hget(name=self.answer_map_name, key=str(seq))
-                if data:
-                    return json.loads(data)
-                else:
-                    return None
-        except TimeoutError as e:
-            logging.error("Failed to get response for seq %s: %s", seq, e)
+        while retry_count < retry:
+        
+            if retry_count > 0:
+                logging.warning(f"正在进行重试操作{retry_count}次")
 
-            if retry_count < retry:
-                retry_count += 1
-                logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
-                time.sleep(retry_internal)
-            else:
-                raise RuntimeError(f"Failed to get connection from Redis: {e}") from e
-        finally:
-            conn.hdel(self.answer_map_name, str(seq))
+            with self.get_redis_connection() as conn:
+                try:
+                    data: str = conn.hget(name=self.answer_map_name, key=str(seq))
+                    if data:
+                        return json.loads(data)
+                    else:
+                        return None
+                except TimeoutError as e:
+                    logging.error("Failed to get response for seq %s: %s", seq, e)
+
+                    if retry_count < retry:
+                        retry_count += 1
+                        logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
+                        time.sleep(retry_internal)
+                    else:
+                        raise RuntimeError(f"Failed to get connection from Redis: {e}") from e
+                finally:
+                    conn.hdel(self.answer_map_name, str(seq))
 
 
     def save_response(self, seq: int,
@@ -241,23 +256,28 @@ class LLMRedisManager:
         """
         retry_count: int = 0
 
-        try:
-            with self.get_redis_connection() as conn:
-                conn.hset(name=f"{self.answer_map_name}", key=str(seq), value=json.dumps({
-                    "seq": seq,
-                    "model": model,
-                    "timestamp": str(datetime.now(timezone.utc)),
-                    "answer": response
-                }))
+        while retry_count < retry:
 
-        except Exception as e:
-            logging.error("Failed to save response for serial %s: %s", seq, e)
-            if retry_count < retry:
-                retry_count += 1
-                logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
-                time.sleep(retry_internal)
-            else:
-                raise RuntimeError(f"Failed to save response to Redis: {e}") from e
+            if retry_count > 0:
+                logging.warning(f"正在进行重试操作{retry_count}次")
+
+            try:
+                with self.get_redis_connection() as conn:
+                    conn.hset(name=f"{self.answer_map_name}", key=str(seq), value=json.dumps({
+                        "seq": seq,
+                        "model": model,
+                        "timestamp": str(datetime.now(timezone.utc)),
+                        "answer": response
+                    }))
+
+            except Exception as e:
+                logging.error("Failed to save response for serial %s: %s", seq, e)
+                if retry_count < retry:
+                    retry_count += 1
+                    logging.warning(f"重试次数: {retry_count}, 重试间隔: {retry_internal} 秒")
+                    time.sleep(retry_internal)
+                else:
+                    raise RuntimeError(f"Failed to save response to Redis: {e}") from e
 
     def stream_chunk(self, seq: int,
                      chunk_text: str,

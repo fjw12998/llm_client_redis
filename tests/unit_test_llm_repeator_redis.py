@@ -3,7 +3,7 @@ from typing import List
 import pytest
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 
-from src.llm_client_redis import LLMClientRedis
+from llm_client_redis import LLMClientRedis
 
 
 @pytest.fixture
