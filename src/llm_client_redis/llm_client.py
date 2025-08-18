@@ -4,7 +4,7 @@ import os
 import redis
 
 from configparser import ConfigParser
-from typing import Any, Generator, List
+from typing import Any, Generator, List, Optional
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 from .tools import LLMResourcesTools
 from .tools import LLMRedisManager
@@ -15,7 +15,7 @@ class LLMClientRedis:
     """
     使用 Redis 实现的 LLM 请求器
     """
-    def __init__(self, llm_json_path: str = None, config_path: str = None):
+    def __init__(self, llm_json_path: Optional[str] = None, config_path: Optional[str] = None):
         """
         初始化 LLMClientRedis 对象
         :param llm_json_path: llm 资源文件路径
@@ -61,13 +61,13 @@ class LLMClientRedis:
                 model: str,
                 block_time = 20 * 60,
                 internal: float = 0.5,
-                enable_arch: bool = True) -> {}:
+                enable_arch: bool = True) -> Optional[dict]:
         """
         将请求消息推送到 Redis 队列中，原样返回答复
         :param messages: 请求消息列表
         :param model: 使用的模型
         :param block_time: 阻塞时间，单位为秒,默认为20分钟
-        :param internal: 请求答案的时间间隔，单位为秒，默认为0.5秒
+        :param internal: 请求答案的时间间隔,单位为秒,默认为0.5秒
         :param enable_arch: 是否启用归档，默认为 True
         :return: 请求序列号，请求序号是用于获取响应的
         """
@@ -106,7 +106,7 @@ class LLMClientRedis:
                        model: str,
                        block_time=20 * 60,
                        internal: float = 0.02,
-                       enable_arch: bool = True) -> Generator[Any, Any, None]:
+                       enable_arch: bool = True) -> Optional[Generator[Any, Any, None]]:
 
         action_type: str = "stream"
         current_time = time.time()

@@ -5,7 +5,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
 from .llm_client import LLMClientRedis
 from langchain_core.messages import SystemMessage, HumanMessage
-from typing import List
+from typing import List, Optional
 
 app = FastAPI()
 
@@ -15,18 +15,18 @@ llm: LLMClientRedis = LLMClientRedis()
 
 class StreamRequest(BaseModel):
     message: str
-    model: str = None
-    system_message: str = None
+    model: Optional[str] = None
+    system_message: Optional[str] = None
 
     @field_validator('system_message')
-    def validate_system_message(cls, v):
+    def validate_system_message(self, v):
         if v == "":
             return None
         return v
 
 class StreamMessagesRequest(BaseModel):
     messages: List[dict]  # 包含role和content的字典列表
-    model: str = None
+    model: Optional[str] = None
 
 @app.post("/stream")
 async def stream(request: StreamRequest):
