@@ -111,3 +111,4 @@ venv.bak/
 .arts/settings.json
 .arts/launch.json
 .idea/inspectionProfiles/Project_Default.xml
+llm_client_redis
