@@ -19,7 +19,7 @@ class StreamRequest(BaseModel):
     system_message: Optional[str] = None
 
     @field_validator('system_message')
-    def validate_system_message(self, v):
+    def validate_system_message(cls, v):
         if v == "":
             return None
         return v
