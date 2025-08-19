@@ -112,3 +112,4 @@ venv.bak/
 .arts/launch.json
 .idea/inspectionProfiles/Project_Default.xml
 llm_client_redis
+.idea/workspace.xml
