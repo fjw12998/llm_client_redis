@@ -77,11 +77,21 @@ uvicorn src.llm_client_redis.llm_restful_client_main:app --reload
 
 * 通过调用 url `http://localhost:8000/models` 可以获取所有可用的 `llm` 模型
 * 通过调用 url `http://localhost:8000/demo.json` 实现流程的 demo
-* 流式访问
-```shell
+* 流式访问 linux 版
+```bash
 curl -X POST http://localhost:8000/stream -H "Content-Type: application/json" -d '{"message": "你好，世界！"}'
 ```
+* 流式访问 windows 版
+```bash
+curl -X POST http://localhost:8000/stream -H "Content-Type: application/json" -d "{\"message\": \"你好，世界！\"}"
+```
 
+## 参与贡献
+
+1.  Fork 本仓库
+2.  新建 Feat_xxx 分支
+3.  提交代码
+4.  新建 Pull Request
 
 
 

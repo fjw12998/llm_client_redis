@@ -1,6 +1,6 @@
 import unittest
 from fastapi.testclient import TestClient
-from src.llm_client_redis.llm_restful_client_main import app
+from llm_client_redis.llm_restful_client_main import app
 
 
 class TestLLMRestfulClient(unittest.TestCase):
