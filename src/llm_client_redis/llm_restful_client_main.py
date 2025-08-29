@@ -6,6 +6,7 @@ from pydantic import BaseModel, field_validator
 from .llm_client import LLMClientRedis
 from langchain_core.messages import SystemMessage, HumanMessage
 from typing import List, Optional
+from langchain_core.messages.ai import AIMessage
 
 app = FastAPI()
 
@@ -75,6 +76,8 @@ async def stream_messages(request: StreamMessagesRequest):
                 messages.append(SystemMessage(msg["content"]))
             elif msg["role"] == "human":
                 messages.append(HumanMessage(msg["content"]))
+            elif msg["role"] == "ai":
+                messages.append(AIMessage(msg["content"]))
             # 可以添加更多角色类型
 
         # 使用默认模型如果未指定
