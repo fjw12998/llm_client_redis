@@ -37,3 +37,18 @@ class OutputTools:
         else:
             return result
 
+    @staticmethod    
+    def only_json(value: Union[str, dict]) -> str:
+
+        result: str = value
+
+        if result.startswith("```json"):
+            result = result[len("```json"):].strip()
+        
+        if result.startswith("```"):
+            result = result[len("```"):].strip()
+        
+        if result.endswith("```"):
+            result = result[:-len("```")].strip()
+
+        return result
