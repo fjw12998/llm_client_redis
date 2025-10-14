@@ -1,24 +1,4 @@
 {
-  "deepseek_r1": {
-    "model": "deepseek-reasoner",
-    "version": "R1",
-    "base_url": "https://api.deepseek.com",
-    "type": "BaseChatOpenAI",
-    "provider": "langchain-deepseek",
-    "env_api_key_name": "DEEPSEEK_API_KEY",
-    "response_type": "deepseek-reasoner",
-    "description": "DeepSeek R1 模型 LangChain 接口"
-  },
-  "deepseek_v3": {
-    "model": "deepseek-chat",
-    "version": "V3",
-    "base_url": "https://api.deepseek.com",
-    "type": "BaseChatOpenAI",
-    "provider": "langchain-deepseek",
-    "env_api_key_name": "DEEPSEEK_API_KEY",
-    "response_type": "deepseek-chat",
-    "description": "DeepSeek V3 模型 LangChain 接口"
-  },
   "huawei_deepseek_r1_32k": {
     "model": "DeepSeek-R1",
     "version": "R1",
@@ -28,6 +8,36 @@
     "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
     "response_type": "deepseek-reasoner",
     "description": "华为云的 DeepSeek R1 32K 模型 LangChain DeepSeek 接口"
+  },
+  "huawei_deepseek_r1_64k": {
+    "model": "DeepSeek-R1",
+    "version": "R1",
+    "base_url": "https://api.modelarts-maas.com/v1",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
+    "response_type": "deepseek-reasoner",
+    "description": "华为云的 DeepSeek R1 64K 模型 LangChain DeepSeek 接口"
+  },
+  "huawei_deepseek_v3.2_exp": {
+    "model": "deepseek-v3.2-exp",
+    "version": "v3.2-exp",
+    "base_url": "https://api.modelarts-maas.com/v1",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
+    "response_type": "deepseek-chat",
+    "description": "华为云的 DeepSeek V3.2-exp 模型 LangChain DeepSeek 接口"
+  },
+  "huawei_deepseek_v3.1": {
+    "model": "deepseek-v3.1",
+    "version": "v3.1",
+    "base_url": "https://api.modelarts-maas.com/v1",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
+    "response_type": "deepseek-chat",
+    "description": "华为云的 DeepSeek V3.1 模型 LangChain DeepSeek 接口"
   },
   "huawei_deepseek_v3_32k": {
     "model": "DeepSeek-V3",
@@ -39,6 +49,16 @@
     "response_type": "deepseek-chat",
     "description": "华为云的 DeepSeek V3 32K 模型 LangChain DeepSeek 接口"
   },
+  "huawei_deepseek_v3_64k": {
+    "model": "DeepSeek-V3",
+    "version": "V1",
+    "base_url": "https://api.modelarts-maas.com/v1",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
+    "response_type": "deepseek-chat",
+    "description": "华为云的 DeepSeek V3 64K 模型 LangChain DeepSeek 接口"
+  },
   "huawei_DeepSeek-R1-32K-0528": {
     "model": "deepseek-r1-250528",
     "version": "R1",
@@ -48,6 +68,16 @@
     "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
     "response_type": "deepseek-reasoner",
     "description": "华为云的 DeepSeek-R1-32K-0528 模型 LangChain DeepSeek 接口"
+  },
+  "huawei_DeepSeek-R1-64K-0528": {
+    "model": "deepseek-r1-250528",
+    "version": "R1",
+    "base_url": "https://api.modelarts-maas.com/v1",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
+    "response_type": "deepseek-reasoner",
+    "description": "华为云的 DeepSeek-R1-64K-0528 模型 LangChain DeepSeek 接口"
   },
   "huawei_qwen3-32b": {
     "model": "qwen3-32b",
@@ -68,6 +98,26 @@
     "env_api_key_name": "HUAWEI_MODEL_ART_API_KEY",
     "response_type": "deepseek-chat",
     "description": "华为云的 qwen3-235b-a22b 模型 LangChain DeepSeek 接口"
+  },
+  "deepseek_r1": {
+    "model": "deepseek-reasoner",
+    "version": "R1",
+    "base_url": "https://api.deepseek.com",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "DEEPSEEK_API_KEY",
+    "response_type": "deepseek-reasoner",
+    "description": "DeepSeek R1 模型 LangChain 接口"
+  },
+  "deepseek_v3": {
+    "model": "deepseek-chat",
+    "version": "V3",
+    "base_url": "https://api.deepseek.com",
+    "type": "BaseChatOpenAI",
+    "provider": "langchain-deepseek",
+    "env_api_key_name": "DEEPSEEK_API_KEY",
+    "response_type": "deepseek-chat",
+    "description": "DeepSeek V3 模型 LangChain 接口"
   },
   "home_deepseek-r1:32b": {
     "model": "deepseek-r1:32b",
