@@ -86,6 +86,35 @@ curl -X POST http://localhost:8000/stream -H "Content-Type: application/json" -d
 curl -X POST http://localhost:8000/stream -H "Content-Type: application/json" -d "{\"message\": \"你好，世界！\"}"
 ```
 
+### 4. llm-watch-dirs 命令说明
+
+`llm-watch-dirs` 是一个目录监控工具，用于监控指定目录中的文件变化，并将文件内容发送到大语言模型进行处理。
+
+#### 命令选项
+
+- `-p`, `--prompt_paths`: 指定监控的目录，多个目录使用英文逗号分隔。与 `-w` 选项不可同时使用。
+- `-o`, `--output_path`: 指定输出子目录名称，默认为 `results`
+- `-i`, `--interval`: 指定监控的间隔时间，默认为 60 秒
+- `-r`, `--random-start`: 是否随机开始，随机的时间是由参数 [i](file://d:\git-huaweicloud\llm_client_redis\config\config.ini) 决定，默认为 `False`
+- `-w`, `--watch-dir`: 指定监控目录，此目录下的所有子目录将会被纳入监控。与 `-p` 选项不可共存。注意目录的名称为需要使用的模型名称加上_数字，例如: `/path/to/model_1,/path/to/model_2`
+
+#### 使用方法
+
+```bash
+# 监控指定的多个目录
+llm-watch-dirs -p /path/to/model_1,/path/to/model_2 -o results -i 60
+
+# 监控目录下的所有子目录
+llm-watch-dirs -w /path/to/watch_dir -o results -i 30
+
+# 随机开始监控
+llm-watch-dirs -p /path/to/model_1 -r
+```
+
+### 工作原理
+
+该工具会定期扫描监控目录中的文件，查找指定后缀名的文件（默认为 [.md](file://d:\git-huaweicloud\llm_client_redis\README.md), [.txt](file://d:\git-huaweicloud\llm_client_redis\requirements.txt), `.pro`, `.prompt`），将文件内容发送到对应的大语言模型进行处理，并将结果保存到每个目录的 `results` 子目录中。
+
 ## 参与贡献
 
 1.  Fork 本仓库

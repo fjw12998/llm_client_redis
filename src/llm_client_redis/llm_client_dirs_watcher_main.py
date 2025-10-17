@@ -52,6 +52,8 @@ class DirsWatcher:
         # sourceDirs 包含 self.focusDirs 中的所有目录，但不是同一个列表，需要另建列表
         sourceDirs: list[str] = self.focusDirs.copy()
 
+        doneWork:bool = False
+
         while True:
             if self.suffle:
                 random.shuffle(sourceDirs)
@@ -68,12 +70,18 @@ class DirsWatcher:
                 result: str = self.llmSendFilesInDir(sourceDir, self.outpuSubDirName, model, self.fileSuffix, overwrite)
 
                 if result is not None and result != "":
-                    logging.info(f"Processing dir: {sourceDir}, model: {model}, result: {result}")
+                    doneWork = True
+                    logging.info(f"Processing dir: {sourceDir}, model: {model}, result: {result}, sleep 3 seconds.")
+                    sleep(3)
+
                 else:
                     logging.info(f"There is no file to process in this dir {sourceDir}")
-            
-            logging.info(f"Sleeping for {self.sleepInterval} seconds")
-            sleep(self.sleepInterval)
+
+            if doneWork:
+                doneWork = False
+            else:
+                logging.info(f"Sleeping for {self.sleepInterval} seconds")
+                sleep(self.sleepInterval)
         pass
 
     def llmSendFilesInDir(self, source_dir: str, output_sub_dir_name: str, model: str, file_suffix: list[str], overwrite: bool = False) -> str:
@@ -94,6 +102,8 @@ class DirsWatcher:
         if files is None or len(files) == 0:
             return ""
 
+        random.shuffle(files)                    
+
         # 需要进行处理的文本
         llm: LLMClientRedis = LLMClientRedis()
 
@@ -101,7 +111,7 @@ class DirsWatcher:
 
             for fileSubffix in file_suffix:
 
-                if str.lower(file).endswith(f".{fileSubffix}"):
+                if str.lower(file).endswith(f"{fileSubffix}"):
                     
                     # 将原文件名重命名加上 .working 后缀表示正在执行
                     os.rename(os.path.join(source_dir, file), os.path.join(source_dir, file + ".working"))
@@ -128,13 +138,21 @@ class DirsWatcher:
                     
                     _only_json = OutputTools.only_json(_result)
 
+                    # 检查  是否存在，不存在则创建
+                    if not os.path.exists(os.path.join(source_dir, output_sub_dir_name)):
+                        os.makedirs(os.path.join(source_dir, output_sub_dir_name))
+                        logging.info(f"Create output sub dir: {output_sub_dir_name}")
+
                     with open(os.path.join(source_dir, output_sub_dir_name, file + ".json"), "w", encoding="utf-8") as f:
                         f.write(_only_json)
                     logging.info(f"Processed json output file: {file}")
 
-                    # 然后将 .working 文件移动到 output_sub_dir_name 目录中，并移除 .working 后缀
-                    os.rename(os.path.join(source_dir, workingFile), os.path.join(source_dir, output_sub_dir_name, file))
-                    logging.info(f"Processed file: {file}, and move to {output_sub_dir_name} directory")
+                    try:
+                        # 然后将 .working 文件移动到 output_sub_dir_name 目录中，并移除 .working 后缀
+                        os.rename(os.path.join(source_dir, workingFile), os.path.join(source_dir, output_sub_dir_name, file))
+                        logging.info(f"Processed file: {file}, and move to {output_sub_dir_name} directory")
+                    except FileNotFoundError as e:
+                        logging.warning(f"Processed file: {file}, and move to {output_sub_dir_name} directory, but file not found, error: {e}, may be the file has been deleted by other process, and skip.")
                     
                     return os.path.join(source_dir, output_sub_dir_name, file)
 
@@ -151,22 +169,49 @@ def main():
     parser = argparse.ArgumentParser(description="定期运行")
 
     # 提示词生成路径
-    parser.add_argument('-p', '--prompt_paths', type=str, required=True, help=f'指定监控的目录,多个目录使用英文逗号分隔,注意目录的名称为需要使用的模型名称加上_数字; 例如: /path/to/model_1,/path/to/model_2,...')
+    parser.add_argument('-p', '--prompt_paths', type=str, required=False, help=f'指定监控的目录,多个目录使用英文逗号分隔,与-w选项不可同存,注意目录的名称为需要使用的模型名称加上_数字; 例如: /path/to/model_1,/path/to/model_2,...')
     parser.add_argument('-o', '--output_path', type=str, default="results", help=f'指定输出子目录名称，默认: results')
     parser.add_argument('-i', '--interval', type=int, default=60, help=f'指定监控的间隔时间，默认: 60 秒')
+    parser.add_argument('-r', '--random-start', action='store_true', help=f'是否随机开始，默认: False')
+
+    parser.add_argument('-w', '--watch-dir', type=str, required=False, help=f'指定监控目录，此目录下的所有子目录将会被纳入监控，与 -p 选项不可共存')
 
     args = parser.parse_args()
 
     prompt_path: str = args.prompt_paths  # 获取提示词生成路径
     output_path: str = args.output_path  # 获取输出路径
     interval: int = args.interval  # 获取间隔时间
+    watch_dir: str = args.watch_dir  # 获取监控目录
+    random_start: bool = args.random_start  # 获取随机开始
 
     # 打印参数用于调试
     logging.info(f"Prompt Path: {prompt_path}")
     logging.info(f"Output Path: {output_path}")
     logging.info(f"Interval: {interval}")
+    logging.info(f"Watch Dir: {watch_dir}")
+    logging.info(f"Random Start: {random_start}")
 
-    focusDirs: list[str] = prompt_path.split(",")
+    if random_start:
+        random_time: int = random.randint(0, interval)
+        logging.info(f"随机开始, 随机时间为: {random_time} 秒")
+        sleep(random_time)
+
+    if prompt_path is None and watch_dir is None:
+        logging.error("请指定监控的目录 -p 或者监控的目录 -w")
+        exit(1)
+
+    if prompt_path is not None and watch_dir is not None:
+        logging.error("请指定监控的目录 -p 或者监控的目录 -w, 不能同时指定")
+        exit(1)
+    
+    focusDirs: list[str] = None
+
+    if prompt_path is not None:                             
+        focusDirs = prompt_path.split(",")
+    
+    if watch_dir is not None:
+        # 此处需要每个 watch_dir 的子目录，均需要与  watch_dir join 在一起
+        focusDirs = [os.path.join(watch_dir, d) for d in os.listdir(watch_dir) if os.path.isdir(os.path.join(watch_dir, d))]
 
     dirWatcher: DirsWatcher = DirsWatcher(focusDirs, output_path, sleep_interval=interval)
 
