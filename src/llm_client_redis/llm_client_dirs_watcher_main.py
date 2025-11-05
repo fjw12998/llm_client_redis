@@ -114,8 +114,17 @@ class DirsWatcher:
                 if str.lower(file).endswith(f"{fileSubffix}"):
                     
                     # 将原文件名重命名加上 .working 后缀表示正在执行
-                    os.rename(os.path.join(source_dir, file), os.path.join(source_dir, file + ".working"))
-                    logging.info(f"Processing file: {file}, and rename to {file + '.working'}")
+                    try:
+                        os.rename(os.path.join(source_dir, file), os.path.join(source_dir, file + ".working"))
+                        logging.info(f"Processing file: {file}, and rename to {file + '.working'}")
+                    except FileNotFoundError as e:
+                        logging.warning(f"Processing file: {file}, and rename to {file + '.working'}, "
+                                        f"but file not found, may be already processed, continue. error: {e}")
+                        continue
+                    except PermissionError as e:
+                        logging.warning(f"Processing file: {file}, and rename to {file + '.working'}, "
+                                        f"but file not found, may be already processed, continue. error: {e}")
+                        continue
 
                     workingFile: str = file + ".working"
 

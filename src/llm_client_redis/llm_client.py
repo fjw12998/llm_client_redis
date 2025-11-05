@@ -131,7 +131,10 @@ class LLMClientRedis:
         # 是否首次思考
         is_first_reasoning: bool = False
 
-        while time.time() - current_time < block_time:
+        # 大模型是否正在运行
+        is_running: bool = False
+
+        while time.time() - current_time < block_time or is_running:
             try:
 
                 if is_reasoning:
@@ -140,11 +143,19 @@ class LLMClientRedis:
 
                     # 原因是直接打印，而不是返回结果
                     if chunk_data and is_first_reasoning == False:
+                        
+                        if is_running == False:
+                            is_running = True
+
                         is_first_reasoning = True
                         print("<think>")
                         print(chunk_data.decode('utf-8'), end="", flush=True)
                         continue
                     elif chunk_data:
+
+                        if is_running == False:
+                            is_running = True
+
                         print(chunk_data.decode('utf-8'), end="", flush=True)
                         continue
 
@@ -169,12 +180,20 @@ class LLMClientRedis:
                             logging.debug(f"seq: {seq} stream is finished, no data in the stream_chunk queue")
 
                             self.redis_manager.rem_finish_stream(seq=seq, chunk_stream_prefix=self.chunk_stream_prefix)
+
+                            # 此处应标记为运行停止
+                            if is_running == True:
+                                is_running = False
+
                             return None
 
                     else:
                         logging.debug(f"seq: {seq} no chunk data received, retrying in {internal} seconds")
                         time.sleep(internal)
                         continue
+                else:
+                    if is_running == False:
+                        is_running = True
 
                 # 原因为空，且
                 if is_reasoning and is_first_reasoning:
