@@ -129,8 +129,13 @@ class DirsWatcher:
                     workingFile: str = file + ".working"
 
                     _text: str = None
-                    with open(os.path.join(source_dir, workingFile), "r", encoding="utf-8") as f:
-                        _text: str = f.read()
+
+                    try:
+                        with open(os.path.join(source_dir, workingFile), "r", encoding="utf-8") as f:
+                            _text: str = f.read()
+                    except PermissionError as e:
+                        logging.warning(f"Processing file: {file}, and read file, but file not found, may be already processed, continue. error: {e}")
+                        continue
 
                     # token_count: int = DeepSeekTokenizer.tokens_len(_text)
 
