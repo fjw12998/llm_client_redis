@@ -61,7 +61,8 @@ class LLMClientRedis:
                 model: str,
                 block_time = 20 * 60,
                 internal: float = 0.5,
-                enable_arch: bool = True) -> Optional[dict]:
+                enable_arch: bool = True,
+                **kwargs) -> Optional[dict]:
         """
         将请求消息推送到 Redis 队列中，原样返回答复
         :param messages: 请求消息列表
@@ -69,6 +70,8 @@ class LLMClientRedis:
         :param block_time: 阻塞时间，单位为秒,默认为20分钟
         :param internal: 请求答案的时间间隔,单位为秒,默认为0.5秒
         :param enable_arch: 是否启用归档，默认为 True
+        :param kwargs: 其他参数
+
         :return: 请求序列号，请求序号是用于获取响应的
         """
         action_type: str = "generate"
@@ -84,7 +87,8 @@ class LLMClientRedis:
                                                    messages=messages,
                                                    model=model,
                                                    action_type=action_type,
-                                                   enable_arch=enable_arch)
+                                                   enable_arch=enable_arch,
+                                                   **kwargs)
 
         logging.info(f"push request to redis using model: {model} with action_type: {action_type}, get answer seq: {seq}")
 
@@ -106,7 +110,8 @@ class LLMClientRedis:
                        model: str,
                        block_time=20 * 60,
                        internal: float = 0.02,
-                       enable_arch: bool = True) -> Optional[Generator[Any, Any, None]]:
+                       enable_arch: bool = True,
+                       **kwargs) -> Optional[Generator[Any, Any, None]]:
 
         action_type: str = "stream"
         current_time = time.time()
@@ -120,7 +125,8 @@ class LLMClientRedis:
             messages=messages,
             model=model,
             action_type=action_type,
-            enable_arch=enable_arch
+            enable_arch=enable_arch,
+            **kwargs
         )
 
         logging.info(f"Pushed request to Redis using model: {model}, action_type: {action_type}, seq: {seq}")
@@ -218,7 +224,8 @@ class LLMClientRedis:
                          model: str,
                          block_time =20 * 60,
                          internal: float = 0.5,
-                         enable_arch: bool = True) -> {}:
+                         enable_arch: bool = True,
+                         **kwargs) -> {}:
         """
         将请求消息推送到 Redis 队列中，使用 config.ini 中配置的 response_type 来处理响应，再返回结果
         :param messages: 请求消息列表
@@ -241,7 +248,8 @@ class LLMClientRedis:
                           model: str,
                           block_time =20 * 60,
                           internal: float = 0.5,
-                          enable_arch: bool = True) -> {}:
+                          enable_arch: bool = True,
+                          **kwargs) -> {}:
         """
         将请求消息推送到 Redis 队列中，使用 config.ini 中配置的 response_type 来处理响应，再返回结果
         :param system: 提示词
@@ -266,7 +274,8 @@ class LLMClientRedis:
                            model: str,
                            block_time = 20 * 60,
                            internal: float = 0.5,
-                           enable_arch: bool = True) -> {}:
+                           enable_arch: bool = True,
+                           **kwargs) -> {}:
         """
         将请求消息推送到 Redis 队列中，使用 config.ini 中配置的 response_type 来处理响应，再返回结果
         :param system_file_path: 提示词文件路径

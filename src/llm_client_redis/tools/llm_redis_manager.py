@@ -120,7 +120,8 @@ class LLMRedisManager:
                      action_type: str = "generate",
                      enable_arch: bool = False,
                      retry: int = 6,
-                     retry_internal: int = 20) -> int:
+                     retry_internal: int = 20,
+                     **kwargs) -> int:
         """
         添加请求
         :param stream_name: 流名称
@@ -130,6 +131,7 @@ class LLMRedisManager:
         :param enable_arch: 是否启用存档，默认：False
         :param retry: 重试次数, 默认为 6 次
         :param retry_internal: 重试间隔时间，单位为秒, 默认为 20 秒
+        :param kwargs: 其他参数
         :return: 请求序列号，请求序号是用于获取响应的
         """
         retry_count: int = 0
@@ -152,7 +154,8 @@ class LLMRedisManager:
                                 'model': model,
                                 'action_type': action_type,
                                 'messages': [msg.model_dump() for msg in messages],
-                                'enable_arch': enable_arch}
+                                'enable_arch': enable_arch,
+                                'llm_kwargs': kwargs}
 
                     data: str = json.dumps(request)
 
@@ -177,6 +180,7 @@ class LLMRedisManager:
         :param stream_name: 流名称
         :param retry: 重试次数, 默认为 6 次
         :param retry_internal: 重试间隔时间，单位为秒, 默认为 20 秒
+
         :return: 待处理请求数据
         """
         retry_count: int = 0
