@@ -64,15 +64,15 @@ class LLMClientRedis:
                 enable_arch: bool = True,
                 **kwargs) -> Optional[dict]:
         """
-        将请求消息推送到 Redis 队列中，原样返回答复
+        将请求消息推送到 Redis 队列中,原样返回答复
         :param messages: 请求消息列表
         :param model: 使用的模型
-        :param block_time: 阻塞时间，单位为秒,默认为20分钟
+        :param block_time: 阻塞时间,单位为秒,默认为20分钟
         :param internal: 请求答案的时间间隔,单位为秒,默认为0.5秒
-        :param enable_arch: 是否启用归档，默认为 True
+        :param enable_arch: 是否启用归档,默认为 True
         :param kwargs: 其他参数
 
-        :return: 请求序列号，请求序号是用于获取响应的
+        :return: 请求序列号,请求序号是用于获取响应的
         """
         action_type: str = "generate"
 
@@ -147,7 +147,7 @@ class LLMClientRedis:
                     # 尝试获取原因分析
                     chunk_data: bytes = self.redis_manager.pop_stream_chunk(seq=seq, chunk_stream_prefix=self.reasoning_stream_prefix)
 
-                    # 原因是直接打印，而不是返回结果
+                    # 原因是直接打印,而不是返回结果
                     if chunk_data and is_first_reasoning == False:
                         
                         if is_running == False:
@@ -175,7 +175,7 @@ class LLMClientRedis:
 
                         logging.info(f"seq: {seq} stream is finished")
 
-                        # 是否存在一个可能，就是流已标记结束，但刚好还有数据在 stream_chunk 的队列中没有补取出？
+                        # 是否存在一个可能,就是流已标记结束,但刚好还有数据在 stream_chunk 的队列中没有补取出？
                         end_chunk_data = self.redis_manager.pop_stream_chunk(seq=seq,
                                                                              chunk_stream_prefix=self.chunk_stream_prefix)
 
@@ -201,7 +201,7 @@ class LLMClientRedis:
                     if is_running == False:
                         is_running = True
 
-                # 原因为空，且
+                # 原因为空,且
                 if is_reasoning and is_first_reasoning:
                     is_reasoning = False
                     print("\n</think>")
@@ -227,19 +227,20 @@ class LLMClientRedis:
                          enable_arch: bool = True,
                          **kwargs) -> {}:
         """
-        将请求消息推送到 Redis 队列中，使用 config.ini 中配置的 response_type 来处理响应，再返回结果
+        将请求消息推送到 Redis 队列中,使用 config.ini 中配置的 response_type 来处理响应,再返回结果
         :param messages: 请求消息列表
         :param model: 使用的模型
-        :param block_time: 阻塞时间，单位为秒,默认为20分钟
-        :param internal: 请求答案的时间间隔，单位为秒，默认为0.5秒
-        :param enable_arch: 是否启用归档，默认为 True
-        :return: 请求序列号，请求序号是用于获取响应的
+        :param block_time: 阻塞时间,单位为秒,默认为20分钟
+        :param internal: 请求答案的时间间隔,单位为秒,默认为0.5秒
+        :param enable_arch: 是否启用归档,默认为 True
+        :return: 请求序列号,请求序号是用于获取响应的
         """
         answer = self.request(messages=messages,
                               model=model,
                               block_time=block_time,
                               internal=internal,
-                              enable_arch=enable_arch)
+                              enable_arch=enable_arch,
+                              **kwargs)
 
         return answer
 
@@ -251,13 +252,13 @@ class LLMClientRedis:
                           enable_arch: bool = True,
                           **kwargs) -> {}:
         """
-        将请求消息推送到 Redis 队列中，使用 config.ini 中配置的 response_type 来处理响应，再返回结果
+        将请求消息推送到 Redis 队列中,使用 config.ini 中配置的 response_type 来处理响应,再返回结果
         :param system: 提示词
         :param human: 问题
         :param model: 使用的模型
-        :param block_time: 阻塞时间，单位为秒,默认为20分钟
-        :param internal: 请求答案的时间间隔，单位为秒，默认为0.5秒
-        :param enable_arch: 是否启用归档，默认为 True
+        :param block_time: 阻塞时间,单位为秒,默认为20分钟
+        :param internal: 请求答案的时间间隔,单位为秒,默认为0.5秒
+        :param enable_arch: 是否启用归档,默认为 True
         :return:
         """
         messages: List[BaseMessage] = [SystemMessage(system), HumanMessage(human)]
@@ -266,7 +267,8 @@ class LLMClientRedis:
                                      model=model,
                                      block_time=block_time,
                                      internal=internal,
-                                     enable_arch=enable_arch)
+                                     enable_arch=enable_arch,
+                                     **kwargs)
 
     def request_file_human(self,
                            system_file_path: str,
@@ -277,14 +279,14 @@ class LLMClientRedis:
                            enable_arch: bool = True,
                            **kwargs) -> {}:
         """
-        将请求消息推送到 Redis 队列中，使用 config.ini 中配置的 response_type 来处理响应，再返回结果
+        将请求消息推送到 Redis 队列中,使用 config.ini 中配置的 response_type 来处理响应,再返回结果
         :param system_file_path: 提示词文件路径
         :param human: 问题
         :param model: 使用的模型
-        :param block_time: 阻塞时间，单位为秒,默认为20分钟
-        :param internal: 请求答案的时间间隔，单位为秒，默认为0.5秒
-        :param enable_arch: 是否启用归档，默认为 True
-        :return: 请求序列号，请求序号是用于获取响应的
+        :param block_time: 阻塞时间,单位为秒,默认为20分钟
+        :param internal: 请求答案的时间间隔,单位为秒,默认为0.5秒
+        :param enable_arch: 是否启用归档,默认为 True
+        :return: 请求序列号,请求序号是用于获取响应的
         """
         with open(system_file_path, 'r', encoding='utf-8') as f:
             prompt: str = f.read()
@@ -295,7 +297,8 @@ class LLMClientRedis:
                                      model=model,
                                      block_time=block_time,
                                      internal=internal,
-                                     enable_arch=enable_arch)
+                                     enable_arch=enable_arch,
+                                     **kwargs)
 
 def init():
     LLMClientRedis()

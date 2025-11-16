@@ -1,10 +1,12 @@
 from typing import List
 
 import pytest
-from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
-
+import logging
+from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage, AIMessage
 from llm_client_redis import LLMClientRedis
 
+
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 @pytest.fixture
 def llm_client_redis() -> LLMClientRedis:
@@ -19,10 +21,27 @@ def test_request(llm_client_redis: LLMClientRedis):
 
     data = llm_client_redis.request(messages=messages, model=model)
 
-    print(data)
+    logging.info(data)
 
     assert data is not None
 
 
+def test_push_request(llm_client_redis: LLMClientRedis):
 
+    model: str = "huawei_deepseek_v3.1"
 
+    messages: List[BaseMessage] = [HumanMessage("写个100字的故事"), AIMessage("不好")]
+
+    result: str = ""
+
+    for data in llm_client_redis.request(messages=messages, 
+                                    model=model, 
+                                    max_tokens=150, 
+                                    continue_final_message=True, 
+                                    add_generation_prompt=False):
+        print(data, flush=True, end="")
+        result += data
+
+    logging.info(result)
+
+    assert result is not None
