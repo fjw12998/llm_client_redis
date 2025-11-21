@@ -84,7 +84,14 @@ class DirsWatcher:
                 sleep(self.sleepInterval)
         pass
 
-    def llmSendFilesInDir(self, source_dir: str, output_sub_dir_name: str, model: str, file_suffix: list[str], overwrite: bool = False) -> str:
+    def llmSendFilesInDir(self, 
+                          source_dir: str, 
+                          output_sub_dir_name: str, 
+                          model: str, 
+                          file_suffix: list[str], 
+                          overwrite: bool = False,
+                          max_retry: int = 6,
+                          retry_sleep_interval: int = 20) -> str:
         """
         在指定目录中查找指定后缀名的文件，并使用指定的模型发送文件内容到大模型，并将结果保存到指定目录中.
         其中，可以从 source_dir 中获取模型名称，因为它均是 model_数字 的形式。
@@ -95,9 +102,20 @@ class DirsWatcher:
         :param model: 模型名称
         :param file_suffix: 文件后缀名
         :param overwrite: 是否覆盖输出文件, 默认为 False
+        :param max_retry: 最大重试次数, 默认为 6
+        :param retry_sleep_interval: 重试间隔时间, 默认为 20 秒
         """
 
-        files: list = os.listdir(source_dir)
+        retry_count: int = 0
+
+        while retry_count < max_retry:
+            try:
+                files: list = os.listdir(source_dir)
+                break
+            except FileNotFoundError as e:
+                logging.warning(f"Processing dir: {source_dir}, model: {model}, but dir not found, may be the network disk faild, wait {retry_sleep_interval} seconds and retry. error: {e}")
+                sleep(retry_sleep_interval)
+                retry_count += 1
 
         if files is None or len(files) == 0:
             return ""
@@ -154,8 +172,17 @@ class DirsWatcher:
 
                     # 检查  是否存在，不存在则创建
                     if not os.path.exists(os.path.join(source_dir, output_sub_dir_name)):
-                        os.makedirs(os.path.join(source_dir, output_sub_dir_name))
-                        logging.info(f"Create output sub dir: {output_sub_dir_name}")
+
+                        while retry_count < max_retry:
+                            try:
+                                os.makedirs(os.path.join(source_dir, output_sub_dir_name))
+                                logging.info(f"Create output sub dir: {output_sub_dir_name}")
+                            # 由于使用网络磁盘的网络故障导致,此处应进行20秒的等待,然后再进行重试
+                            except FileNotFoundError as e:
+                                logging.warning(f"{retry_count}/{max_retry} Create output sub dir: {output_sub_dir_name}, "
+                                                f"but file not found, may be network error, sleep {retry_sleep_interval} seconds, and retry. error: {e}")
+                                sleep(retry_sleep_interval)
+                                retry_count += 1
 
                     with open(os.path.join(source_dir, output_sub_dir_name, file + ".json"), "w", encoding="utf-8") as f:
                         f.write(_only_json)

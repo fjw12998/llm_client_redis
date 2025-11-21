@@ -22,8 +22,24 @@ def test_request(llm_client_redis: LLMClientRedis):
     logging.info(data)
 
 
-def test_request_stream(llm_client_redis: LLMClientRedis):
+def test_request_stream_v31(llm_client_redis: LLMClientRedis):
     model: str = "huawei_deepseek_v3.1"
+    messages: List[BaseMessage] = [HumanMessage("写个100字的故事"), AIMessage("不好")]
+    
+    result: str = ""
+    
+    for data in llm_client_redis.request_stream(messages=messages, 
+                                    model=model, 
+                                    max_tokens=150, 
+                                    continue_final_message=True, 
+                                    add_generation_prompt=False):
+        print(data, flush=True, end="")
+        result += data
+    
+    logging.info(result)
+
+def test_request_stream_v3(llm_client_redis: LLMClientRedis):
+    model: str = "huawei_deepseek_v3_64k"
     messages: List[BaseMessage] = [HumanMessage("写个100字的故事"), AIMessage("不好")]
     
     result: str = ""
@@ -41,4 +57,5 @@ def test_request_stream(llm_client_redis: LLMClientRedis):
 if __name__ == "__main__":
     llm_client_redis:LLMClientRedis = LLMClientRedis(llm_json_path="../config/llm_resources.json", config_path="../config/config.ini")
     test_request(llm_client_redis)
-    test_request_stream(llm_client_redis)
+    test_request_stream_v31(llm_client_redis)
+    test_request_stream_v3(llm_client_redis)
