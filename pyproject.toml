@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "llm_client_redis"
-version = "0.1.10"
+version = "0.1.11"
 authors = [
     { name="Fang JiaWei", email="fjw12998@hotmail.com" },
 ]
@@ -38,6 +38,7 @@ chat-session = "llm_client_redis.chat_session_main:main"
 llm-client-init = "llm_client_redis.llm_client:init"
 llm-client-dir = "llm_client_redis.llm_client_dir_sender_main:main"
 llm-watch-dirs = "llm_client_redis.llm_client_dirs_watcher_main:main"
+llm-context-watch-dirs = "llm_client_redis.llm_context_client_dirs_watcher_main:main"
 
 [project.urls]
 Homepage = "https://gitee.com/sky_flash/llm_client_redis"
